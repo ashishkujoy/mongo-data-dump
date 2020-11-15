@@ -1,8 +1,8 @@
-use chrono::Utc;
-use indicatif::ProgressStyle;
-use indicatif::ProgressBar;
 use crate::Client;
 use crate::JsonFileWriter;
+use chrono::Utc;
+use indicatif::ProgressBar;
+use indicatif::ProgressStyle;
 use structopt::StructOpt;
 use tokio::stream::StreamExt;
 

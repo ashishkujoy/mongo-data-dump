@@ -1,4 +1,7 @@
 use mongodb::{bson::Document, Client};
+use serde_json::Map;
+use serde_json::Value;
+use std::convert::TryFrom;
 use std::fs::File;
 use std::io::BufReader;
 use structopt::StructOpt;
@@ -21,16 +24,17 @@ pub struct RestoreDatabaseDump {
 impl RestoreDatabaseDump {
     pub async fn run(&self, client: &Client) {
         let collection = client.database(&self.database).collection(&self.collection);
-        collection
-            .insert_many(self.read_dump(), None)
-            .await
-            .unwrap();
+        let docs = self
+            .read_dump()
+            .into_iter()
+            .map(|hashmap| Document::try_from(hashmap).unwrap());
+
+        collection.insert_many(docs, None).await.unwrap();
     }
 
-    fn read_dump(&self) -> Vec<Document> {
+    fn read_dump(&self) -> Vec<Map<String, Value>> {
         let f = File::open(&self.backup_file).unwrap();
         let reader = BufReader::new(f);
-
         serde_json::from_reader(reader).unwrap()
     }
 }
