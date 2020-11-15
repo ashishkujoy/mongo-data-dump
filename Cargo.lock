@@ -869,6 +869,7 @@ version = "0.1.0"
 dependencies = [
  "futures",
  "mongodb",
+ "serde",
  "serde_json",
  "structopt",
  "tokio",

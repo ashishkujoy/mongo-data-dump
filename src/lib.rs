@@ -1,7 +1,8 @@
+use crate::writer::json_writer::JsonFileWriter;
 use futures::stream::StreamExt;
 use mongodb::Client;
-use std::{fs::File, io::Write};
 use structopt::StructOpt;
+mod writer;
 
 #[derive(Debug, StructOpt)]
 pub struct Cli {
@@ -48,18 +49,11 @@ impl Cli {
                 .await
                 .expect("Failed to read from collection");
 
-            let mut file = File::create(format!("{}.json", &collection_name)).unwrap();
-            file.write(b"[").unwrap();
-
-            let mut not_first_entry = false;
+            let mut file_writer = JsonFileWriter::new(format!("{}.json", &collection_name));
+        
             while let Some(Ok(doc)) = cursor.next().await {
-                if not_first_entry {
-                    file.write(b",").unwrap();
-                }
-                serde_json::to_writer_pretty(&file, &doc).unwrap();
-                not_first_entry = true;
+                file_writer.write(&doc);
             }
-            file.write(b"]").unwrap();
         }
     }
 }
