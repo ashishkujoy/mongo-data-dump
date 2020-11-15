@@ -3,8 +3,5 @@ use structopt::StructOpt;
 
 #[tokio::main]
 async fn main() {
-    let cli = Cli::from_args();
-
-    println!("{:?}", cli);
-    cli.run().await;
+    Cli::from_args().run().await;
 }
