@@ -867,6 +867,7 @@ dependencies = [
 name = "mongo-data-dump"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "futures",
  "mongodb",
  "serde",

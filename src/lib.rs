@@ -3,6 +3,7 @@ use futures::stream::StreamExt;
 use mongodb::Client;
 use structopt::StructOpt;
 mod writer;
+use chrono::Utc;
 
 #[derive(Debug, StructOpt)]
 pub struct Cli {
@@ -49,11 +50,14 @@ impl Cli {
                 .await
                 .expect("Failed to read from collection");
 
-            let mut file_writer = JsonFileWriter::new(format!("{}.json", &collection_name));
-        
+            let mut file_writer = JsonFileWriter::new(self.get_file_name(&collection_name));
             while let Some(Ok(doc)) = cursor.next().await {
                 file_writer.write(&doc);
             }
         }
+    }
+
+    fn get_file_name(&self, collection_name: &String) -> String {
+        format!("{}_{}.json", collection_name, Utc::now().timestamp_millis())
     }
 }
