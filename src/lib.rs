@@ -1,5 +1,7 @@
 use crate::writer::json_writer::JsonFileWriter;
 use futures::stream::StreamExt;
+use indicatif::ProgressBar;
+use indicatif::ProgressStyle;
 use mongodb::Client;
 use structopt::StructOpt;
 mod writer;
@@ -43,8 +45,11 @@ impl Cli {
 
     async fn create_dump(&self, client: &Client, collection_names: Vec<String>) {
         for collection_name in collection_names {
+            println!("Taking dump of {}", collection_name);
             let collection = client.database(&self.database).collection(&collection_name);
-
+            let count = collection.count_documents(None, None).await.unwrap();
+            let doc_progress =
+                ProgressBar::new(count as u64).with_style(ProgressStyle::default_bar().progress_chars(&"=>"));
             let mut cursor = collection
                 .find(None, None)
                 .await
@@ -53,7 +58,9 @@ impl Cli {
             let mut file_writer = JsonFileWriter::new(self.get_file_name(&collection_name));
             while let Some(Ok(doc)) = cursor.next().await {
                 file_writer.write(&doc);
+                doc_progress.inc(1);
             }
+            doc_progress.finish_and_clear();
         }
     }
 
