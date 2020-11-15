@@ -17,6 +17,9 @@ pub enum Command {
     /// Take dump of database
     #[structopt(name = "dump")]
     Dump(commands::take_dump::TakeDatabaseDump),
+    /// Restore dump of database
+    #[structopt(name = "restore")]
+    Restore(commands::restore_dump::RestoreDatabaseDump),
 }
 
 #[derive(StructOpt, Debug)]
@@ -32,6 +35,9 @@ impl Cli {
         match &self.command {
             Command::Dump(take_database_dump) => {
                 take_database_dump.run(&client).await;
+            }
+            Command::Restore(restore_database_dump) => {
+                restore_database_dump.run(&client).await;
             }
         }
     }

@@ -8,10 +8,6 @@ use tokio::stream::StreamExt;
 
 #[derive(Debug, StructOpt)]
 pub struct TakeDatabaseDump {
-    /// Mongo connection string for connecting to database
-    #[structopt(long = "connection-url", default_value = "mongodb://localhost:27017")]
-    connection_string: String,
-
     /// Collection name for which dump is required, no value is provided
     /// data dump will be taken for all collections.
     #[structopt(long = "collection")]
